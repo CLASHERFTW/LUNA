@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luna - Period Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="chatbot.css">
+    
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="login-page" class="min-h-screen flex flex-col">
+        <header class="bg-purple-500 text-white py-4 px-6 shadow-md">
+            <div class="container mx-auto flex justify-between items-center">
+                <h1 class="text-2xl font-bold">Luna</h1>
+                <p class="text-sm">Your Personal Period Tracker</p>
+            </div>
+        </header>
+
+        <main class="flex-1 container mx-auto grid md:grid-cols-2 gap-8 py-12 px-4">
+            <div class="flex flex-col justify-center space-y-6 max-w-md mx-auto w-full">
+                <div class="space-y-2 text-center">
+                    <h1 class="text-3xl font-bold">Welcome to Luna</h1>
+                    <p class="text-gray-500">Track your cycle, understand your body, and take control of your health</p>
+                </div>
+                
+                <div class="auth-container">
+                    <div class="auth-tabs">
+                        <div class="auth-tab active" data-tab="login">Login</div>
+                        <div class="auth-tab" data-tab="register">Register</div>
+                    </div>
+                    
+                    <div class="card">
+                        <div id="login-form" class="auth-form active">
+                            <div class="card-header">
+                                <h2 class="card-title">Login</h2>
+                                <p class="card-description">Enter your email and password to access your account</p>
+                            </div>
+                            <div class="card-content">
+                                <form id="login-form-element">
+                                    <div class="form-group">
+                                        <label for="login-email" class="form-label">Email</label>
+                                        <input type="email" id="login-email" class="form-input" placeholder="m@example.com" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="flex justify-between items-center">
+                                            <label for="login-password" class="form-label">Password</label>
+                                            <a href="#" class="text-sm text-purple-500 hover:underline">Forgot password?</a>
+                                        </div>
+                                        <input type="password" id="login-password" class="form-input" required>
+                                    </div>
+                                    <div id="login-error" class="text-red-500 text-sm mb-4 hidden"></div>
+                                    <button type="submit" class="btn btn-primary w-full">Login</button>
+                                </form>
+                                
+                                <div class="mt-4 text-center">
+                                    <p class="text-sm text-gray-500 mb-2">Or sign in with</p>
+                                    <button id="google-signin" class="btn btn-outline w-full flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24">
+                                            <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" fill="#4285F4"/>
+                                        </svg>
+                                        Sign in with Google
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="register-form" class="auth-form">
+                            <div class="card-header">
+                                <h2 class="card-title">Create an account</h2>
+                                <p class="card-description">Enter your information to create a Luna account</p>
+                            </div>
+                            <div class="card-content">
+                                <form id="register-form-element">
+                                    <div class="form-group">
+                                        <label for="register-name" class="form-label">Full Name</label>
+                                        <input type="text" id="register-name" class="form-input" placeholder="Jane Doe" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="register-email" class="form-label">Email</label>
+                                        <input type="email" id="register-email" class="form-input" placeholder="m@example.com" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="register-password" class="form-label">Password</label>
+                                        <input type="password" id="register-password" class="form-input" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="register-confirm-password" class="form-label">Confirm Password</label>
+                                        <input type="password" id="register-confirm-password" class="form-input" required>
+                                    </div>
+                                    <div id="register-error" class="text-red-500 text-sm mb-4 hidden"></div>
+                                    <button type="submit" class="btn btn-primary w-full">Create account</button>
+                                </form>
+                                
+                                <div class="mt-4 text-center">
+                                    <p class="text-sm text-gray-500 mb-2">Or sign up with</p>
+                                    <button id="google-signup" class="btn btn-outline w-full flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24">
+                                            <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" fill="#4285F4"/>
+                                        </svg>
+                                        Sign up with Google
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hidden md:flex items-center justify-center">
+                <div class="relative w-full max-w-lg aspect-square">
+                    <div class="absolute inset-0 bg-gradient-to-r from-purple-200 to-green-200 rounded-full blur-3xl"></div>
+                    <div class="relative bg-white rounded-2xl shadow-xl p-6 h-full flex flex-col justify-center items-center space-y-6 scale-in">
+                        <div class="w-24 h-24 rounded-full bg-purple-100 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="text-center space-y-2">
+                            <h3 class="text-xl font-medium">Track Your Cycle</h3>
+                            <p class="text-gray-500">
+                                Luna helps you predict your next period, track symptoms, and understand your body better.
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4 w-full">
+                            <div class="flex flex-col items-center text-center p-3 rounded-lg bg-gray-100 staggered-item">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mb-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <span class="text-xs font-medium">Period Tracking</span>
+                            </div>
+                            <div class="flex flex-col items-center text-center p-3 rounded-lg bg-gray-100 staggered-item">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mb-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <span class="text-xs font-medium">Mood Tracking</span>
+                            </div>
+                            <div class="flex flex-col items-center text-center p-3 rounded-lg bg-gray-100 staggered-item">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mb-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <span class="text-xs font-medium">Health Insights</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboard-page" class="min-h-screen flex flex-col hidden">
+        <!-- Navigation -->
+        <nav class="bg-purple-500 text-white sticky top-0 z-50 shadow-md">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center">
+                        <a href="#" class="text-xl font-bold" onclick="showTab('home')">Luna</a>
+                    </div>
+                    
+                    <!-- Desktop Navigation -->
+                    <div class="hidden md:flex items-center space-x-4">
+                        <a href="#" class="nav-link active" onclick="showTab('home')">Home</a>
+                        <a href="#" class="nav-link" onclick="showTab('mood')">Mood Tracker</a>
+                        <a href="#" class="nav-link" onclick="showTab('remedies')">Home Remedies</a>
+                        <a href="#" class="nav-link" onclick="showTab('analysis')">Analysis</a>
+                        <a href="#" class="nav-link" onclick="showTab('challenges')">Challenges</a>
+                        <a href="#" class="nav-link" onclick="showTab('contact')">Contact</a>
+                        <a href="#" class="nav-link" onclick="showTab('about')">About</a>
+                        <a href="#" class="nav-link" onclick="showTab('developers')">Meet the Team</a>
+                    </div>
+                    
+                    <div class="flex items-center space-x-2">
+                        <button class="btn btn-icon" id="theme-toggle" aria-label="Toggle theme">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                            </svg>
+                        </button>
+                        
+                        <!-- Mobile Navigation Toggle -->
+                        <button class="md:hidden btn btn-icon" id="mobile-menu-toggle">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Mobile Menu -->
+        <div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
+        <div class="mobile-menu" id="mobile-menu">
+            <div class="flex justify-end mb-6">
+                <button class="btn btn-icon" id="mobile-menu-close">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <nav class="flex flex-col gap-4">
+                <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-100 hover:text-purple-500" onclick="showTab('home'); closeMobileMenu()">Home</a>
+                <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-100 hover:text-purple-500" onclick="showTab('mood'); closeMobileMenu()">Mood Tracker</a>
+                <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-100 hover:text-purple-500" onclick="showTab('remedies'); closeMobileMenu()">Home Remedies</a>
+                <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-100 hover:text-purple-500" onclick="showTab('analysis'); closeMobileMenu()">Analysis</a>
+                <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-100 hover:text-purple-500" onclick="showTab('challenges'); closeMobileMenu()">Challenges</a>
+                <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-100 hover:text-purple-500" onclick="showTab('contact'); closeMobileMenu()">Contact</a>
+                <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-100 hover:text-purple-500" onclick="showTab('about'); closeMobileMenu()">About</a>
+                <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-100 hover:text-purple-500" onclick="showTab('developers'); closeMobileMenu()">Meet the Team</a>
+                <button class="btn btn-outline mt-4" onclick="logout()">Logout</button>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <main class="flex-1">
+            <!-- Home Tab -->
+            <div id="home" class="tab-content active">
+                <div class="container mx-auto py-8 px-4 space-y-8">
+                    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        <div class="card col-span-full md:col-span-2 scale-in">
+                            <div class="card-header">
+                                <h2 class="card-title">Period Tracker</h2>
+                                <p class="card-description">Track your menstrual cycle and stay informed about your health</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="space-y-6">
+                                    <div class="grid gap-4 md:grid-cols-2">
+                                        <div class="space-y-2">
+                                            <label for="lastPeriod" class="form-label">Last Period Start Date</label>
+                                            <input type="date" id="lastPeriod" class="form-input">
+                                        </div>
+                                        
+                                        <div class="space-y-2">
+                                            <label for="cycleDuration" class="form-label">Average Cycle Length (days)</label>
+                                            <input type="number" id="cycleDuration" class="form-input" min="20" max="45" value="28">
+                                        </div>
+                                    </div>
+                                    
+                                    <button onclick="calculateNextPeriod()" class="btn btn-primary">Calculate Next Period</button>
+                                    
+                                    <div id="period-result" class="card mt-4 overflow-hidden fade-in hidden">
+                                        <div class="p-6">
+                                            <h4 class="text-lg font-semibold text-purple-500 mb-4">Your Results</h4>
+                                            <div class="grid gap-4 md:grid-cols-2">
+                                                <div class="space-y-1">
+                                                    <p class="text-sm text-gray-500">Next period expected:</p>
+                                                    <p class="text-lg font-medium" id="next-period-date"></p>
+                                                </div>
+                                                <div class="space-y-1">
+                                                    <p class="text-sm text-gray-500">Fertile window:</p>
+                                                    <p class="text-lg font-medium" id="fertile-window"></p>
+                                                </div>
+                                                <div class="space-y-1">
+                                                    <p class="text-sm text-gray-500">Days until next period:</p>
+                                                    <p class="text-lg font-medium" id="days-until"></p>
+                                                </div>
+                                                <div class="space-y-1">
+                                                    <p class="text-sm text-gray-500">Cycle length:</p>
+                                                    <p class="text-lg font-medium" id="cycle-length"></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card scale-in" style="animation-delay: 0.1s;">
+                            <div class="card-header">
+                                <h2 class="card-title">Cycle Stats</h2>
+                                <p class="card-description">Your cycle at a glance</p>
+                            </div>
+                            <div class="card-content space-y-4">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="bg-gray-100 rounded-lg p-4 text-center">
+                                        <p class="text-sm text-gray-500">Avg. Cycle</p>
+                                        <p class="text-2xl font-bold">28 days</p>
+                                    </div>
+                                    <div class="bg-gray-100 rounded-lg p-4 text-center">
+                                        <p class="text-sm text-gray-500">Avg. Period</p>
+                                        <p class="text-2xl font-bold">5 days</p>
+                                    </div>
+                                    <div class="bg-gray-100 rounded-lg p-4 text-center">
+                                        <p class="text-sm text-gray-500">Last Period</p>
+                                        <p class="text-2xl font-bold" id="last-period-display">-</p>
+                                    </div>
+                                    <div class="bg-gray-100 rounded-lg p-4 text-center">
+                                        <p class="text-sm text-gray-500">Next Period</p>
+                                        <p class="text-2xl font-bold" id="next-period-display">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        <div class="card col-span-full scale-in" style="animation-delay: 0.2s;">
+                            <div class="card-header">
+                                <h2 class="card-title">Calendar View</h2>
+                                <p class="card-description">Track your cycle on the calendar</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <button class="btn btn-outline btn-icon" id="prev-month">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                            </svg>
+                                        </button>
+                                        <h3 class="text-lg font-medium" id="current-month-display"></h3>
+                                        <button class="btn btn-outline btn-icon" id="next-month">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-7 gap-1" id="calendar-container">
+                                        <div class="text-center text-sm font-medium py-2">Sun</div>
+                                        <div class="text-center text-sm font-medium py-2">Mon</div>
+                                        <div class="text-center text-sm font-medium py-2">Tue</div>
+                                        <div class="text-center text-sm font-medium py-2">Wed</div>
+                                        <div class="text-center text-sm font-medium py-2">Thu</div>
+                                        <div class="text-center text-sm font-medium py-2">Fri</div>
+                                        <div class="text-center text-sm font-medium py-2">Sat</div>
+                                        <!-- Calendar days will be inserted by JavaScript -->
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-center space-x-6 mt-4">
+                                        <div class="flex items-center space-x-2">
+                                            <div class="w-4 h-4 rounded-full bg-purple-500"></div>
+                                            <span class="text-sm">Period</span>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <div class="w-4 h-4 rounded-full bg-green-500"></div>
+                                            <span class="text-sm">Fertile Window</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mood Tracker Tab -->
+            <div id="mood" class="tab-content">
+                <div class="container mx-auto py-8 px-4 space-y-8">
+                    <div class="card scale-in">
+                        <div class="card-header">
+                            <h2 class="card-title">Mood Tracker</h2>
+                            <p class="card-description">Track your emotional wellbeing throughout your cycle</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="space-y-6 max-w-2xl mx-auto">
+                                <div class="bg-gray-100 p-6 rounded-lg">
+                                    <h3 class="text-xl font-semibold mb-4">How are you feeling today? 🤔</h3>
+                                    
+                                    <div class="space-y-4">
+                                        <div class="space-y-2">
+                                            <label for="energy" class="form-label">Energy Level</label>
+                                            <select id="energy" class="form-select">
+                                                <option value="">Select your energy level</option>
+                                                <option value="high">Very Energetic 🔋</option>
+                                                <option value="medium">Moderate Energy ⚡</option>
+                                                <option value="low">Low Energy 😴</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="space-y-2">
+                                            <label for="comfort" class="form-label">Physical Comfort</label>
+                                            <select id="comfort" class="form-select">
+                                                <option value="">Select comfort level</option>
+                                                <option value="good">Comfortable 😊</option>
+                                                <option value="mild">Mild Discomfort 😕</option>
+                                                <option value="pain">Having Pain 😣</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="space-y-2">
+                                            <label for="emotion" class="form-label">Emotional State</label>
+                                            <select id="emotion" class="form-select">
+                                                <option value="">Select your emotion</option>
+                                                <option value="happy">Happy 😊</option>
+                                                <option value="anxious">Anxious 😰</option>
+                                                <option value="irritated">Irritated 😠</option>
+                                                <option value="sad">Sad 😢</option>
+                                                <option value="neutral">Neutral 😐</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <button onclick="analyzeMood()" class="btn btn-primary w-full mt-4">Analyze My Mood</button>
+                                    </div>
+                                </div>
+                                
+                                <div id="mood-result" class="card overflow-hidden fade-in hidden">
+                                    <div class="p-6">
+                                        <div class="flex flex-col items-center text-center space-y-4">
+                                            <div class="text-5xl" id="mood-emoji"></div>
+                                            <h4 class="text-xl font-semibold text-purple-500" id="mood-title"></h4>
+                                            <p class="text-gray-500" id="mood-recommendation"></p>
+                                            
+                                            <!-- Add food and music recommendation sections -->
+                                            <div class="w-full mt-4 p-4 bg-gray-100 rounded-lg">
+                                                <h5 class="font-medium mb-2">Food Recommendation</h5>
+                                                <p id="food-recommendation" class="text-sm mb-3"></p>
+                                                <a id="zomato-link" href="https://zomato.onelink.me/xqzv/4bxbaocq" target="_blank" class="btn btn-primary text-sm">
+                                                    Order Food on Zomato
+                                                </a>
+                                            </div>
+                                            
+                                            <div class="w-full mt-2 p-4 bg-gray-100 rounded-lg">
+                                                <h5 class="font-medium mb-2">Music for Your Mood</h5>
+                                                <a id="spotify-link" href="https://open.spotify.com/playlist/37i9dQZF1DX1s9knjP51Oa" target="_blank" class="btn btn-outline text-sm">
+                                                    Listen on Spotify
+                                                </a>
+                                            </div>
+                                            
+                                            <div class="grid grid-cols-3 gap-4 w-full mt-4">
+                                                <div class="mood-item staggered-item">
+                                                    <div class="mood-icon">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                                        </svg>
+                                                    </div>
+                                                    <span class="text-xs font-medium">Self-care</span>
+                                                </div>
+                                                <div class="mood-item staggered-item" style="animation-delay: 0.1s;">
+                                                    <div class="mood-icon">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                        </svg>
+                                                    </div>
+                                                    <span class="text-xs font-medium">Rest</span>
+                                                </div>
+                                                <div class="mood-item staggered-item" style="animation-delay: 0.2s;">
+                                                    <div class="mood-icon">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                    </div>
+                                                    <span class="text-xs font-medium">Connect</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Remedies Tab -->
+            <div id="remedies" class="tab-content">
+                <div class="container mx-auto py-8 px-4 space-y-8">
+                    <div class="card scale-in">
+                        <div class="card-header">
+                            <h2 class="card-title">Home Remedies</h2>
+                            <p class="card-description">Natural ways to manage period symptoms</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                                    <div class="flex items-center mb-4">
+                                        <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mr-4">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                                            </svg>
+                                        </div>
+                                        <h3 class="text-lg font-semibold">Heat Therapy</h3>
+                                    </div>
+                                    <p class="text-gray-600">Apply a heating pad to your lower abdomen to relieve cramps. The heat helps relax the muscles and increase blood flow, reducing pain.</p>
+                                    <div class="mt-4 text-sm text-purple-600">
+                                        <span class="font-medium">Tip:</span> Try a warm bath with Epsom salts for full-body relief.
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                                    <div class="flex items-center mb-4">
+                                        <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mr-4">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                            </svg>
+                                        </div>
+                                        <h3 class="text-lg font-semibold">Exercise</h3>
+                                    </div>
+                                    <p class="text-gray-600">Light exercises like yoga, walking, or swimming can help reduce period pain. Exercise releases endorphins, which are natural pain relievers.</p>
+                                    <div class="mt-4 text-sm text-purple-600">
+                                        <span class="font-medium">Tip:</span> Try gentle yoga poses like Child's Pose or Cat-Cow Stretch.
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                                    <div class="flex items-center mb-4">
+                                        <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mr-4">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                            </svg>
+                                        </div>
+                                        <h3 class="text-lg font-semibold">Herbal Tea</h3>
+                                    </div>
+                                    <p class="text-gray-600">Chamomile, ginger, or peppermint tea can help with menstrual discomfort. These herbs have anti-inflammatory and calming properties.</p>
+                                    <div class="mt-4 text-sm text-purple-600">
+                                        <span class="font-medium">Tip:</span> Add a teaspoon of honey for extra soothing benefits.
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                                    <div class="flex items-center mb-4">
+                                        <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mr-4">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.701 2.701 0 00-1.5-.454M9 6v2m3-2v2m3-2v2M9 3h.01M12 3h.01M15 3h.01M21 21v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7h18zm-3-9v-2a2 2 0 00-2-2H8a2 2 0 00-2 2v2h12z" />
+                                            </svg>
+                                        </div>
+                                        <h3 class="text-lg font-semibold">Dietary Changes</h3>
+                                    </div>
+                                    <p class="text-gray-600">Reduce salt, sugar, caffeine, and alcohol. Increase foods rich in omega-3 fatty acids, calcium, and magnesium to help reduce inflammation.</p>
+                                    <div class="mt-4 text-sm text-purple-600">
+                                        <span class="font-medium">Tip:</span> Dark chocolate (70%+ cocoa) can help boost mood and reduce cravings.
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                                    <div class="flex items-center mb-4">
+                                        <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mr-4">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                        <h3 class="text-lg font-semibold">Stress Reduction</h3>
+                                    </div>
+                                    <p class="text-gray-600">Practice deep breathing, meditation, or mindfulness to reduce stress, which can worsen period symptoms. Try to get adequate sleep.</p>
+                                    <div class="mt-4 text-sm text-purple-600">
+                                        <span class="font-medium">Tip:</span> Try the 4-7-8 breathing technique: inhale for 4 seconds, hold for 7, exhale for 8.
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                                    <div class="flex items-center mb-4">
+                                        <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mr-4">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                            </svg>
+                                        </div>
+                                        <h3 class="text-lg font-semibold">Essential Oils</h3>
+                                    </div>
+                                    <p class="text-gray-600">Lavender, clary sage, and marjoram essential oils can help reduce period pain when used in massage or aromatherapy.</p>
+                                    <div class="mt-4 text-sm text-purple-600">
+                                        <span class="font-medium">Tip:</span> Mix a few drops with a carrier oil and massage onto your lower abdomen.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Tab -->
+            <div id="analysis" class="tab-content">
+                <div class="container mx-auto py-8 px-4 space-y-8">
+                    <div class="card scale-in">
+                        <div class="card-header">
+                            <h2 class="card-title">Period Analysis</h2>
+                            <p class="card-description">Understand your cycle patterns</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="grid gap-8 md:grid-cols-2">
+                                <div class="bg-gray-100 p-6 rounded-lg">
+                                    <h3 class="text-xl font-semibold mb-4">Share Your Experience</h3>
+                                    <form id="health-form" class="space-y-4">
+                                        <div class="form-group">
+                                            <label for="age" class="form-label">Your Age</label>
+                                            <input type="number" id="age" class="form-input" min="8" max="60" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="regularity" class="form-label">Period Regularity</label>
+                                            <select id="regularity" class="form-select" required>
+                                                <option value="">Select your experience</option>
+                                                <option value="regular">Regular (Every 21-35 days)</option>
+                                                <option value="irregular">Irregular (Unpredictable)</option>
+                                                <option value="veryIrregular">Very Irregular (>35 days apart)</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="symptoms" class="form-label">Common Symptoms</label>
+                                            <select id="symptoms" class="form-select" required>
+                                                <option value="">Select primary symptom</option>
+                                                <option value="cramps">Severe Cramps</option>
+                                                <option value="headache">Headaches</option>
+                                                <option value="mood">Mood Swings</option>
+                                                <option value="fatigue">Fatigue</option>
+                                                <option value="none">No Major Symptoms</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="symptomDuration" class="form-label">Symptom Duration (days)</label>
+                                            <input type="number" id="symptomDuration" class="form-input" min="0" max="14" value="0">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="painLevel" class="form-label">Pain Level (1-10)</label>
+                                            <input type="range" id="painLevel" class="w-full" min="1" max="10" value="5">
+                                            <div class="flex justify-between text-xs text-gray-500">
+                                                <span>Mild</span>
+                                                <span>Moderate</span>
+                                                <span>Severe</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Select Symptoms (Multiple)</label>
+                                            <div class="grid grid-cols-2 gap-2 mt-2">
+                                                <div class="flex items-center">
+                                                    <input type="checkbox" id="symptom-cramps" class="mr-2" value="cramps">
+                                                    <label for="symptom-cramps">Cramps</label>
+                                                </div>
+                                                <div class="flex items-center">
+                                                    <input type="checkbox" id="symptom-headache" class="mr-2" value="headache">
+                                                    <label for="symptom-headache">Headache</label>
+                                                </div>
+                                                <div class="flex items-center">
+                                                    <input type="checkbox" id="symptom-bloating" class="mr-2" value="bloating">
+                                                    <label for="symptom-bloating">Bloating</label>
+                                                </div>
+                                                <div class="flex items-center">
+                                                    <input type="checkbox" id="symptom-fatigue" class="mr-2" value="fatigue">
+                                                    <label for="symptom-fatigue">Fatigue</label>
+                                                </div>
+                                                <div class="flex items-center">
+                                                    <input type="checkbox" id="symptom-mood" class="mr-2" value="mood">
+                                                    <label for="symptom-mood">Mood Swings</label>
+                                                </div>
+                                                <div class="flex items-center">
+                                                    <input type="checkbox" id="symptom-acne" class="mr-2" value="acne">
+                                                    <label for="symptom-acne">Acne</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <button type="submit" class="btn btn-primary w-full">Submit Data</button>
+                                    </form>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-4">Your Cycle Insights</h3>
+                                    <div class="bg-white p-6 rounded-lg shadow-md">
+                                        <!-- Pie Chart Container -->
+                                        <div class="mb-6">
+                                            <h4 class="font-medium mb-3">Symptom Distribution</h4>
+                                            <div class="aspect-square max-w-md mx-auto">
+                                                <canvas id="symptomChart" aria-label="Symptom distribution pie chart" role="img"></canvas>
+                                            </div>
+                                        </div>
+                                        
+                                        <p class="mb-4">Based on your data, here are some insights:</p>
+                                        <ul class="space-y-2 list-disc pl-5">
+                                            <li>Your cycle length is within the normal range</li>
+                                            <li>Your symptoms are common among people your age</li>
+                                            <li>Consider tracking your mood alongside your cycle</li>
+                                            <li>Hydration may help with your reported symptoms</li>
+                                        </ul>
+                                        <div class="mt-6 pt-6 border-t border-gray-200">
+                                            <h4 class="font-medium mb-2">Recommendations:</h4>
+                                            <p class="text-sm text-gray-600" id="personalized-recommendations">Continue tracking for at least 3 months to establish your personal patterns. This will help you better predict and prepare for your periods.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Tab -->
+            <div id="contact" class="tab-content">
+                <div class="container mx-auto py-8 px-4 space-y-8">
+                    <div class="card scale-in">
+                        <div class="card-header">
+                            <h2 class="card-title">Contact & Feedback</h2>
+                            <p class="card-description">We'd love to hear from you</p>
+                        </div>
+                        <div class="card-content">
+                            <form id="feedback-form" class="max-w-lg mx-auto">
+                                <div class="space-y-4">
+                                    <div class="form-group">
+                                        <label for="name" class="form-label">Your Name</label>
+                                        <input type="text" id="name" class="form-input" placeholder="Jane Doe" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="email" class="form-label">Your Email</label>
+                                        <input type="email" id="email" class="form-input" placeholder="jane@example.com" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="rating" class="form-label">Rate your experience</label>
+                                        <select id="rating" class="form-select" required>
+                                            <option value="">Select a rating</option>
+                                            <option value="5">Excellent</option>
+                                            <option value="4">Good</option>
+                                            <option value="3">Average</option>
+                                            <option value="2">Fair</option>
+                                            <option value="1">Poor</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="message" class="form-label">Your Feedback</label>
+                                        <textarea id="message" rows="5" class="form-input" placeholder="Tell us what you think..." required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-full">Submit Feedback</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Challenges Tab -->
+            <div id="challenges" class="tab-content">
+                <div class="container mx-auto py-8 px-4">
+                    <div class="card scale-in">
+                        <div class="card-header">
+                            <h2 class="card-title">Wellness Challenges</h2>
+                            <p class="card-description">Complete challenges to improve your health and earn points</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-xl font-semibold">Your Points: <span id="user-points">0</span></h3>
+                                <button onclick="refreshChallenges()" class="btn btn-outline">Refresh Challenges</button>
+                            </div>
+                            <div id="challenges-list" class="space-y-4">
+                                <!-- Challenges will be dynamically added here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- About Tab -->
+            <div id="about" class="tab-content">
+                <div class="container mx-auto py-8 px-4 space-y-8">
+                    <div class="card scale-in">
+                        <div class="card-header">
+                            <h2 class="card-title">About Luna</h2>
+                            <p class="card-description">Your personal period tracking companion</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="grid gap-8 md:grid-cols-2">
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-4">Our Mission</h3>
+                                    <p class="mb-4">Luna was created to help people track, understand, and manage their menstrual cycles with ease and privacy. We believe that period tracking should be simple, informative, and empowering.</p>
+                                    <p>Our goal is to provide you with the tools and information you need to better understand your body and make informed decisions about your health.</p>
+                                    
+                                    <h3 class="text-xl font-semibold mt-8 mb-4">Privacy First</h3>
+                                    <p>Your data is yours. Luna is designed with privacy as a priority, ensuring that your sensitive health information remains secure and confidential.</p>
+                                </div>
+                                <div class="bg-gray-100 p-6 rounded-lg">
+                                    <h3 class="text-xl font-semibold mb-4">Features</h3>
+                                    <ul class="space-y-4">
+                                        <li class="flex">
+                                            <div class="mr-4 flex-shrink-0">
+                                                <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h4 class="font-medium">Period Tracking</h4>
+                                                <p class="text-sm text-gray-600">Track your cycle, predict your next period, and monitor your fertile window.</p>
+                                            </div>
+                                        </li>
+                                        <li class="flex">
+                                            <div class="mr-4 flex-shrink-0">
+                                                <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h4 class="font-medium">Mood Tracking</h4>
+                                                <p class="text-sm text-gray-600">Monitor your emotional wellbeing throughout your cycle.</p>
+                                            </div>
+                                        </li>
+                                        <li class="flex">
+                                            <div class="mr-4 flex-shrink-0">
+                                                <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h4 class="font-medium">Health Insights</h4>
+                                                <p class="text-sm text-gray-600">Get personalized insights and recommendations based on your cycle data.</p>
+                                            </div>
+                                        </li>
+                                        <li class="flex">
+                                            <div class="mr-4 flex-shrink-0">
+                                                <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h4 class="font-medium">Educational Resources</h4>
+                                                <p class="text-sm text-gray-600">Access helpful information about menstrual health and natural remedies.</p>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Meet the Developers Tab -->
+            <div id="developers" class="tab-content">
+                <div class="container mx-auto py-8 px-4 space-y-8">
+                    <div class="card scale-in">
+                        <div class="card-header">
+                            <h2 class="card-title">Meet the Developers</h2>
+                            <p class="card-description">The team behind Luna</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                                <div class="bg-white dark:bg-gray-700 rounded-lg shadow-md overflow-hidden transition-transform duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg">
+                                    <img src="https://via.placeholder.com/300x200" alt="Muskaan" class="w-full h-48 object-cover">
+                                    <div class="p-4">
+                                        <h3 class="text-xl font-semibold mb-2">Muskaan</h3>
+                                        <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Lead Developer</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Muskaan led the development of Luna, focusing on the core functionality and user experience.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white dark:bg-gray-700 rounded-lg shadow-md overflow-hidden transition-transform duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg">
+                                    <img src="https://via.placeholder.com/300x200" alt="Harsh Pathak" class="w-full h-48 object-cover">
+                                    <div class="p-4">
+                                        <h3 class="text-xl font-semibold mb-2">Harsh Pathak</h3>
+                                        <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">UI/UX Designer</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Harsh crafted the beautiful and intuitive interface of Luna, ensuring a seamless user experience.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-analytics.js";
+      import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+      import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
+      
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyCYG50HqsuYq_O4QjSXLdE-MjW78A_JdTM",
+        authDomain: "luna-dd43a.firebaseapp.com",
+        projectId: "luna-dd43a",
+        storageBucket: "luna-dd43a.firebasestorage.app",
+        messagingSenderId: "484758980308",
+        appId: "1:484758980308:web:2cf260d43efc5d94b95d41",
+        measurementId: "G-7W98RCPW8M"
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+      
+      // Initialize Google Auth Provider
+      const googleProvider = new GoogleAuthProvider();
+      
+      // Make Firebase services available globally
+      window.firebaseApp = app;
+      window.firebaseAuth = auth;
+      window.firebaseDb = db;
+      window.firebaseAnalytics = analytics;
+      window.googleProvider = googleProvider;
+      window.firebaseFunctions = {
+        createUser: createUserWithEmailAndPassword,
+        signIn: signInWithEmailAndPassword,
+        signOut: signOut,
+        signInWithGoogle: signInWithPopup,
+        addDocument: addDoc,
+        getDocuments: getDocs,
+        getDocument: getDoc,
+        setDocument: setDoc,
+        collection: collection,
+        doc: doc
+      };
+    </script>
+
+    <script src="script.js"></script>
+    <script src="chatbot.js"></script>
+</body>
+</html>
